@@ -4,14 +4,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using MassTransit;
 using Contracts;
+using AutoMapper;
+using SearchService.Models;
+using MongoDB.Entities;
 
 namespace SearchService.Consumers
 {
     public class AuctionCreatedConsumer : IConsumer<AuctionCreated>
     {
-        public Task Consume(ConsumeContext<AuctionCreated> context)
+        private readonly IMapper _mapper;
+
+        public AuctionCreatedConsumer(IMapper mapper)
         {
-            throw new NotImplementedException();
+            _mapper = mapper;
+        }
+        public async Task Consume(ConsumeContext<AuctionCreated> context)
+        {
+            Console.WriteLine("--> Consuming" + context.Message.Id);
+            var item = _mapper.Map<Item>(context.Message);
+            await item.SaveAsync();
         }
     }
 }

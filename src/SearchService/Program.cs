@@ -1,6 +1,7 @@
 using MassTransit;
 using MongoDB.Driver;
 using MongoDB.Entities;
+using SearchService.Consumers;
 using SearchService.Data;
 using SearchService.Models;
 
@@ -12,6 +13,8 @@ builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureEndpoints(context);
@@ -35,7 +38,7 @@ catch (Exception e)
     Console.WriteLine($"❌ Database initialization failed:");
     Console.WriteLine($"Message: {e.Message}");
     Console.WriteLine($"Stack Trace: {e.StackTrace}");
-    throw; // 重新抛出，让应用启动失败
+    throw; 
 }
 
 app.Run();
